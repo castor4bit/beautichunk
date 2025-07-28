@@ -30,7 +30,7 @@
   "license": "MIT",
   "type": "commonjs",
   "engines": {
-    "node": ">=20.0.0 <25.0.0"
+    "node": ">=20.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
