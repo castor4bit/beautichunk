@@ -61,6 +61,8 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@types/acorn": "^4.0.6",
+    "acorn": "^8.15.0",
     "commander": "^14.0.0"
   }
 }
