@@ -43,6 +43,10 @@ out/
 tmp/
 temp/
 
+# Examples
+examples/*/node_modules/
+examples/*/package-lock.json
+
 # Cache
 .cache/
 .eslintcache
