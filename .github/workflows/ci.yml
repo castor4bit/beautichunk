@@ -38,6 +38,11 @@ jobs:
     - name: Run tests
       run: npm run test:coverage
     
+    - name: Test dual package support
+      run: |
+        cd examples/cjs-project && npm install && npm test
+        cd ../../examples/esm-project && npm install && npm test
+    
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
       if: matrix.node-version == '20.x'

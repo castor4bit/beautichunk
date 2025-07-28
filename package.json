@@ -2,13 +2,35 @@
   "name": "beautichunk",
   "version": "0.1.0",
   "description": "Transform obfuscated JavaScript files into readable, chunked modules",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
-    "beautichunk": "./dist/cli.js"
+    "beautichunk": "./dist/esm/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "npm run build:clean && npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:clean": "rm -rf dist",
+    "build:cjs": "tsc -p tsconfig.cjs.json && npm run build:cjs:pkg",
+    "build:cjs:pkg": "echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "build:esm": "tsc -p tsconfig.esm.json && npm run build:esm:pkg",
+    "build:esm:pkg": "echo '{\"type\":\"module\"}' > dist/esm/package.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "dev": "tsc -p tsconfig.esm.json --watch",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
@@ -28,7 +50,6 @@
   ],
   "author": "Toru Tanaka",
   "license": "MIT",
-  "type": "commonjs",
   "engines": {
     "node": ">=20.0.0"
   },

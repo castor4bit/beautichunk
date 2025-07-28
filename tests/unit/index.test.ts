@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Beautichunk, type BeautichunkOptions } from '../../src/index';
+import { Beautichunk, type BeautichunkOptions } from '../../src/index.js';
 
 describe('Beautichunk', () => {
   describe('constructor', () => {

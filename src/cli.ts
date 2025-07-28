@@ -5,7 +5,7 @@ import { Command } from 'commander';
 const version = '0.1.0'; // TODO: Read from package.json
 
 import * as fs from 'node:fs/promises';
-import { Beautichunk, type BeautichunkOptions } from './index';
+import { Beautichunk, type BeautichunkOptions } from './index.js';
 
 const program = new Command();
 
