@@ -1,4 +1,5 @@
-import { Beautichunk, BeautichunkOptions } from '../../src/index';
+import { describe, expect, it } from 'vitest';
+import { Beautichunk, type BeautichunkOptions } from '../../src/index';
 
 describe('Beautichunk', () => {
   describe('constructor', () => {

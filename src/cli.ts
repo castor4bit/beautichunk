@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+
 const version = '0.1.0'; // TODO: Read from package.json
-import { Beautichunk, BeautichunkOptions } from './index';
-import * as fs from 'fs/promises';
+
+import * as fs from 'node:fs/promises';
+import { Beautichunk, type BeautichunkOptions } from './index';
 
 const program = new Command();
 
@@ -20,8 +22,7 @@ program
   .option('-v, --verbose', 'Enable verbose logging', false)
   .option('--strategy <type>', 'Chunking strategy (aggressive|conservative|auto)', 'auto')
   .option('-c, --config <file>', 'Configuration file path')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .action(async (input: string, options: any) => {
+  .action(async (input: string, options: Record<string, unknown>) => {
     try {
       const config: BeautichunkOptions = {
         input,
