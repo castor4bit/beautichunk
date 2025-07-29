@@ -1,4 +1,14 @@
 import type { Node, Program } from 'acorn';
+import type {
+  ArrowFunctionExpression,
+  BlockStatement,
+  CallExpression,
+  FunctionDeclaration,
+  FunctionExpression,
+  Identifier,
+  MemberExpression,
+  VariableDeclaration,
+} from './types/ast';
 
 export interface Variable {
   name: string;
@@ -78,26 +88,26 @@ export class Analyzer {
         this.traverseProgram(node as Program);
         break;
       case 'VariableDeclaration':
-        this.analyzeVariableDeclaration(node as any);
+        this.analyzeVariableDeclaration(node as VariableDeclaration);
         break;
       case 'FunctionDeclaration':
-        this.analyzeFunctionDeclaration(node as any);
+        this.analyzeFunctionDeclaration(node as FunctionDeclaration);
         break;
       case 'FunctionExpression':
       case 'ArrowFunctionExpression':
-        this.analyzeFunctionExpression(node as any);
+        this.analyzeFunctionExpression(node as FunctionExpression | ArrowFunctionExpression);
         break;
       case 'CallExpression':
-        this.analyzeCallExpression(node as any);
+        this.analyzeCallExpression(node as CallExpression);
         break;
       case 'Identifier':
-        this.analyzeIdentifier(node as any);
+        this.analyzeIdentifier(node as Identifier);
         break;
       case 'MemberExpression':
-        this.analyzeMemberExpression(node as any);
+        this.analyzeMemberExpression(node as MemberExpression);
         break;
       case 'BlockStatement':
-        this.traverseArray((node as any).body);
+        this.traverseArray((node as BlockStatement).body);
         break;
       default:
         this.traverseNodeProperties(node);
@@ -115,19 +125,20 @@ export class Analyzer {
   }
 
   private traverseNodeProperties(node: Node): void {
-    for (const key in node) {
-      const value = (node as any)[key];
+    const obj = node as unknown as Record<string, unknown>;
+    for (const key in obj) {
+      const value = obj[key];
       if (value && typeof value === 'object') {
         if (Array.isArray(value)) {
-          this.traverseArray(value);
-        } else if (value.type) {
-          this.traverseNode(value);
+          this.traverseArray(value as Node[]);
+        } else if ((value as Node).type) {
+          this.traverseNode(value as Node);
         }
       }
     }
   }
 
-  private analyzeVariableDeclaration(node: any): void {
+  private analyzeVariableDeclaration(node: VariableDeclaration): void {
     const { kind, declarations } = node;
     for (const declarator of declarations) {
       if (declarator.id.type === 'Identifier') {
@@ -145,10 +156,17 @@ export class Analyzer {
     }
   }
 
-  private analyzeFunctionDeclaration(node: any): void {
+  private analyzeFunctionDeclaration(node: FunctionDeclaration): void {
     const functionInfo: FunctionInfo = {
       name: node.id.name,
-      params: node.params.map((param: any) => param.name),
+      params: node.params
+        .map((param) => {
+          if (param.type === 'Identifier') {
+            return param.name;
+          }
+          return ''; // Handle other pattern types if needed
+        })
+        .filter((name) => name !== ''),
       scope: this.currentScope,
     };
     this.result.functions.push(functionInfo);
@@ -182,7 +200,7 @@ export class Analyzer {
     this.exitScope();
   }
 
-  private analyzeFunctionExpression(node: any): void {
+  private analyzeFunctionExpression(node: FunctionExpression | ArrowFunctionExpression): void {
     this.enterScope();
 
     // Add parameters as variables in the function scope
@@ -201,7 +219,7 @@ export class Analyzer {
     this.exitScope();
   }
 
-  private analyzeCallExpression(node: any): void {
+  private analyzeCallExpression(node: CallExpression): void {
     if (node.callee.type === 'Identifier') {
       const calleeName = node.callee.name;
 
@@ -219,7 +237,7 @@ export class Analyzer {
     this.traverseArray(node.arguments);
   }
 
-  private analyzeIdentifier(node: any): void {
+  private analyzeIdentifier(node: Identifier): void {
     const name = node.name;
 
     if (this.currentFunctionName && !this.isLocalVariable(name)) {
@@ -232,7 +250,7 @@ export class Analyzer {
     }
   }
 
-  private analyzeMemberExpression(node: any): void {
+  private analyzeMemberExpression(node: MemberExpression): void {
     // Handle object.property access
     if (node.object.type === 'Identifier') {
       const objectName = node.object.name;
