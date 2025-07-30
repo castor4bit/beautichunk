@@ -103,6 +103,15 @@ output/
 └── manifest.json
 ```
 
+## Current Limitations
+
+1. **ES6 Modules**: Import/export statements are not yet supported for dependency analysis
+2. **Dynamic Code**: Runtime-generated code (eval, Function constructor) cannot be analyzed
+3. **File Size**: Very large files (>100MB) may cause memory issues
+4. **Binary Files**: Only text-based JavaScript files are supported
+
+See [TODO.md](./TODO.md) for planned improvements and known issues.
+
 ## Development
 
 ```bash
@@ -122,9 +131,24 @@ npm test
 npm run dev
 ```
 
+### Project Structure
+
+```
+src/
+├── parser.ts      # AST parsing using Acorn
+├── analyzer.ts    # Dependency and scope analysis
+├── chunker.ts     # Code splitting logic
+├── index.ts       # Main API
+└── cli.ts         # Command-line interface
+```
+
 ## Contributing
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+Contributions are welcome! Please:
+1. Check [TODO.md](./TODO.md) for planned features
+2. Follow the TDD approach (write tests first)
+3. Ensure all tests pass and maintain >80% coverage
+4. Submit PRs with detailed descriptions
 
 ## License
 

@@ -76,6 +76,10 @@ export class Chunker {
             }
           }
           break;
+        // TODO: Add support for ES6 modules
+        // case 'ExportNamedDeclaration':
+        // case 'ExportDefaultDeclaration':
+        // case 'ImportDeclaration':
       }
 
       // Find dependencies for functions in this segment

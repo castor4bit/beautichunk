@@ -109,6 +109,11 @@ export class Analyzer {
       case 'BlockStatement':
         this.traverseArray((node as BlockStatement).body);
         break;
+      // TODO: Add support for ES6 modules and dynamic imports
+      // case 'ImportDeclaration':
+      // case 'ExportNamedDeclaration':
+      // case 'ExportDefaultDeclaration':
+      // case 'ImportExpression': // dynamic import()
       default:
         this.traverseNodeProperties(node);
     }
