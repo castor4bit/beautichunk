@@ -23,11 +23,13 @@ export class Parser {
 
   constructor(options: ParseOptions = {}) {
     this.options = {
-      ecmaVersion: 2022,
+      ecmaVersion: 2022, // TODO: Support ES2023+ features
       sourceType: 'module',
       locations: true,
       ...options,
     };
+    // TODO: Add support for JSX/TSX parsing
+    // TODO: Consider using @babel/parser for TypeScript support
   }
 
   parse(code: string): AcornProgram {
@@ -44,6 +46,7 @@ export class Parser {
       const ast = acorn.parse(code, acornOptions) as AcornProgram;
       return ast;
     } catch (error) {
+      // TODO: Implement error recovery to continue parsing after syntax errors
       if (error instanceof SyntaxError) {
         const parseError = error as ParseError;
         throw new SyntaxError(`Parse error at position ${parseError.pos}: ${parseError.message}`);
