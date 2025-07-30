@@ -109,6 +109,18 @@ export class Analyzer {
       case 'BlockStatement':
         this.traverseArray((node as BlockStatement).body);
         break;
+      // TODO: Add support for ES6 modules and dynamic imports
+      // case 'ImportDeclaration':
+      // case 'ExportNamedDeclaration':
+      // case 'ExportDefaultDeclaration':
+      // case 'ImportExpression': // dynamic import()
+      // TODO: Add support for classes
+      // case 'ClassDeclaration':
+      // case 'ClassExpression':
+      // TODO: Add support for async/await
+      // case 'AwaitExpression':
+      // TODO: Add support for generators
+      // case 'YieldExpression':
       default:
         this.traverseNodeProperties(node);
     }
@@ -150,6 +162,7 @@ export class Analyzer {
         this.result.variables.push(variable);
         this.currentScope.variables.push(variable);
       }
+      // TODO: Handle destructuring patterns (ObjectPattern, ArrayPattern)
       if (declarator.init) {
         this.traverseNode(declarator.init);
       }
@@ -213,6 +226,8 @@ export class Analyzer {
         };
         this.currentScope.variables.push(paramVar);
       }
+      // TODO: Handle destructuring in parameters
+      // TODO: Handle rest parameters
     }
 
     this.traverseNode(node.body);

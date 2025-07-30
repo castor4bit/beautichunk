@@ -62,7 +62,9 @@
   },
   "dependencies": {
     "@types/acorn": "^4.0.6",
+    "@types/escodegen": "^0.0.10",
     "acorn": "^8.15.0",
-    "commander": "^14.0.0"
+    "commander": "^14.0.0",
+    "escodegen": "^2.1.0"
   }
 }
