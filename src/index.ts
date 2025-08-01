@@ -32,3 +32,21 @@ export class Beautichunk {
 }
 
 export default Beautichunk;
+
+export {
+  type AnalysisResult,
+  Analyzer,
+  type FunctionInfo,
+  type Scope,
+  type Variable,
+} from './analyzer.js';
+export { Beautifier, type BeautifierOptions } from './beautifier.js';
+export { type Chunk, Chunker, type ChunkerOptions } from './chunker.js';
+export {
+  type ChunkMetadata,
+  Generator,
+  type GeneratorOptions,
+  type Manifest,
+} from './generator.js';
+// Export modules for use as library
+export { type ParseError, type ParseOptions, Parser } from './parser.js';
