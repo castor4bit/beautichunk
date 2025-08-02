@@ -1,9 +1,11 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { glob } from 'glob';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FileIO } from '../../src/file-io.js';
 
 vi.mock('node:fs/promises');
+vi.mock('glob');
 
 describe('FileIO', () => {
   const mockFs = vi.mocked(fs);
@@ -82,8 +84,7 @@ describe('FileIO', () => {
       const contents = ['content1', 'content2'];
 
       // Mock glob expansion
-      // biome-ignore lint/suspicious/noExplicitAny: Mocking private method for testing
-      vi.spyOn(fileIO, 'expandGlob' as any).mockResolvedValue(files);
+      vi.mocked(glob).mockResolvedValue(files);
       mockFs.readFile.mockResolvedValueOnce(contents[0]).mockResolvedValueOnce(contents[1]);
 
       const results = await fileIO.readInputFiles([globPattern]);
