@@ -58,3 +58,4 @@ export {
 } from './generator.js';
 // Export modules for use as library
 export { type ParseError, type ParseOptions, Parser } from './parser.js';
+export { CLI } from './cli.js';
