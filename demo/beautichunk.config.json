@@ -1,0 +1,10 @@
+{
+  "maxChunkSize": 2048,
+  "strategy": "conservative",
+  "beautifyOptions": {
+    "indentSize": 4,
+    "indentChar": " ",
+    "preserveNewlines": true,
+    "wrapLineLength": 80
+  }
+}

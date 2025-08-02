@@ -28,6 +28,7 @@ interface CodeSegment {
 
 export class Chunker {
   private options: ChunkerOptions;
+  private chunkCounter = 0;
 
   constructor(options: Partial<ChunkerOptions> = {}) {
     this.options = {
@@ -385,7 +386,7 @@ export class Chunker {
     // First pass: create chunks and map segments to chunk IDs
     for (let i = 0; i < chunkGroups.length; i++) {
       const group = chunkGroups[i];
-      const chunkId = `chunk_${String(i).padStart(3, '0')}`;
+      const chunkId = `chunk_${String(this.chunkCounter++).padStart(3, '0')}`;
 
       const content = group.map((seg) => seg.code).join('\n');
       const exports: string[] = [];

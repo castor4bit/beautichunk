@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "chunks": [
+    {
+      "id": "chunk_000",
+      "filename": "chunk_000.js",
+      "dependencies": [],
+      "exports": [
+        "_0x1a2b",
+        "_0x5e6f",
+        "initializeStore",
+        "simulateUserActivity"
+      ],
+      "size": 4556,
+      "order": 0
+    }
+  ],
+  "entryPoint": "loader.js",
+  "totalSize": 4556,
+  "generatedAt": "2025-08-02T16:48:24.430Z"
+}
