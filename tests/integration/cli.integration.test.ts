@@ -34,9 +34,7 @@ console.log(multiply(3,4));
     await fs.writeFile(inputPath, inputContent);
 
     // Run CLI
-    const { stdout, stderr } = await execAsync(
-      `node ${cliPath} ${inputPath} -o ${outputDir}`
-    );
+    const { stdout, stderr } = await execAsync(`node ${cliPath} ${inputPath} -o ${outputDir}`);
 
     // Check output
     expect(stderr).toBe('');
@@ -64,9 +62,7 @@ console.log(multiply(3,4));
     await fs.writeFile(file2, 'function bar(){return "bar"}');
 
     // Run CLI
-    const { stdout, stderr } = await execAsync(
-      `node ${cliPath} ${file1} ${file2} -o ${outputDir}`
-    );
+    const { stdout, stderr } = await execAsync(`node ${cliPath} ${file1} ${file2} -o ${outputDir}`);
 
     expect(stderr).toBe('');
     expect(stdout).toContain('Processing 2 file(s)');
@@ -77,7 +73,7 @@ console.log(multiply(3,4));
     // Create a large input file
     const inputPath = path.join(tempDir, 'large.js');
     const outputDir = path.join(tempDir, 'output');
-    
+
     // Generate content larger than 1KB
     let content = '';
     for (let i = 0; i < 100; i++) {
@@ -86,15 +82,15 @@ console.log(multiply(3,4));
     await fs.writeFile(inputPath, content);
 
     // Run CLI with 1KB chunk size
-    const { stdout, stderr } = await execAsync(
-      `node ${cliPath} ${inputPath} -o ${outputDir} --max-chunk-size 1`
+    const { stderr } = await execAsync(
+      `node ${cliPath} ${inputPath} -o ${outputDir} --max-chunk-size 1`,
     );
 
     expect(stderr).toBe('');
-    
+
     // Check multiple chunks were created
     const files = await fs.readdir(outputDir);
-    const chunkFiles = files.filter(f => f.startsWith('chunk_'));
+    const chunkFiles = files.filter((f) => f.startsWith('chunk_'));
     expect(chunkFiles.length).toBeGreaterThan(1);
   });
 
@@ -104,8 +100,8 @@ console.log(multiply(3,4));
     const config = {
       maxChunkSize: 1024,
       beautifyOptions: {
-        indentSize: 4
-      }
+        indentSize: 4,
+      },
     };
     await fs.writeFile(configPath, JSON.stringify(config));
 
@@ -115,20 +111,20 @@ console.log(multiply(3,4));
     await fs.writeFile(inputPath, 'function test(){return 42}');
 
     // Run CLI with config
-    const { stdout, stderr } = await execAsync(
-      `node ${cliPath} ${inputPath} -o ${outputDir} --config ${configPath}`
+    const { stderr } = await execAsync(
+      `node ${cliPath} ${inputPath} -o ${outputDir} --config ${configPath}`,
     );
 
     expect(stderr).toBe('');
-    
+
     // Check beautified content has 4-space indentation
     const chunkContent = await fs.readFile(path.join(outputDir, 'chunk_000.js'), 'utf-8');
-    expect(chunkContent).toMatch(/^    return 42/m); // 4 spaces
+    expect(chunkContent).toMatch(/^ {4}return 42/m); // 4 spaces
   });
 
   it('should show help', async () => {
     const { stdout } = await execAsync(`node ${cliPath} --help`);
-    
+
     expect(stdout).toContain('beautichunk');
     expect(stdout).toContain('Transform obfuscated JavaScript files');
     expect(stdout).toContain('--output');
@@ -137,19 +133,20 @@ console.log(multiply(3,4));
 
   it('should show version', async () => {
     const { stdout } = await execAsync(`node ${cliPath} --version`);
-    
+
     expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
   it('should handle errors gracefully', async () => {
     const outputDir = path.join(tempDir, 'output');
-    
+
     try {
       await execAsync(`node ${cliPath} nonexistent.js -o ${outputDir}`);
       expect.fail('Should have thrown an error');
-    } catch (error: any) {
-      expect(error.code).toBe(1);
-      expect(error.stderr).toContain('Error:');
+    } catch (error) {
+      const execError = error as { code: number; stderr: string };
+      expect(execError.code).toBe(1);
+      expect(execError.stderr).toContain('Error:');
     }
   });
 });

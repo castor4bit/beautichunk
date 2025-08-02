@@ -42,6 +42,7 @@ export {
 } from './analyzer.js';
 export { Beautifier, type BeautifierOptions } from './beautifier.js';
 export { type Chunk, Chunker, type ChunkerOptions } from './chunker.js';
+export { CLI } from './cli.js';
 export {
   type CreateDirectoryOptions,
   FileIO,
@@ -58,4 +59,3 @@ export {
 } from './generator.js';
 // Export modules for use as library
 export { type ParseError, type ParseOptions, Parser } from './parser.js';
-export { CLI } from './cli.js';
