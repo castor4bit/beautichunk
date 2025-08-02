@@ -216,8 +216,11 @@ export class CLI {
   }
 }
 
-// Main entry point
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Export CLI class for testing
+export default CLI;
+
+// Main entry point - only execute if this is the CLI entry point
+if (process.argv[1]?.endsWith('/cli.js')) {
   const cli = new CLI();
   cli.run(process.argv).catch(() => {
     process.exit(1);
