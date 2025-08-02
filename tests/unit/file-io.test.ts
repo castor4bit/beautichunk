@@ -82,6 +82,7 @@ describe('FileIO', () => {
       const contents = ['content1', 'content2'];
 
       // Mock glob expansion
+      // biome-ignore lint/suspicious/noExplicitAny: Mocking private method for testing
       vi.spyOn(fileIO, 'expandGlob' as any).mockResolvedValue(files);
       mockFs.readFile.mockResolvedValueOnce(contents[0]).mockResolvedValueOnce(contents[1]);
 

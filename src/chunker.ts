@@ -28,6 +28,7 @@ interface CodeSegment {
 
 export class Chunker {
   private options: ChunkerOptions;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: Used in generateChunks method
   private chunkCounter = 0;
 
   constructor(options: Partial<ChunkerOptions> = {}) {
