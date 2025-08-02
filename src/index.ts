@@ -43,6 +43,14 @@ export {
 export { Beautifier, type BeautifierOptions } from './beautifier.js';
 export { type Chunk, Chunker, type ChunkerOptions } from './chunker.js';
 export {
+  type CreateDirectoryOptions,
+  FileIO,
+  type FileStats,
+  type InputFile,
+  type ReadOptions,
+  type ValidationResult,
+} from './file-io.js';
+export {
   type ChunkMetadata,
   Generator,
   type GeneratorOptions,
