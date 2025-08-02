@@ -96,8 +96,8 @@ describe('Generator', () => {
       );
       expect(manifestCall).toBeDefined();
 
-      const manifestPath = manifestCall![0];
-      const manifestContent = JSON.parse(manifestCall![1] as string);
+      const manifestPath = manifestCall?.[0];
+      const manifestContent = JSON.parse(manifestCall?.[1] as string);
 
       expect(manifestPath).toBe(path.join('/tmp/output', 'manifest.json'));
       expect(manifestContent).toMatchObject({
@@ -134,8 +134,8 @@ describe('Generator', () => {
       const loaderCall = mockFs.writeFile.mock.calls.find((call) => call[0].includes('loader.js'));
       expect(loaderCall).toBeDefined();
 
-      const loaderPath = loaderCall![0];
-      const loaderContent = loaderCall![1] as string;
+      const loaderPath = loaderCall?.[0];
+      const loaderContent = loaderCall?.[1] as string;
 
       expect(loaderPath).toBe(path.join('/tmp/output', 'loader.js'));
       expect(loaderContent).toContain('manifest.json');
@@ -265,7 +265,7 @@ describe('Generator', () => {
       expect(mockFs.readFile).toHaveBeenCalledWith('/custom/loader.js', 'utf-8');
 
       const loaderCall = mockFs.writeFile.mock.calls.find((call) => call[0].includes('loader.js'));
-      expect(loaderCall![1]).toBe(customLoaderContent);
+      expect(loaderCall?.[1]).toBe(customLoaderContent);
     });
 
     it('should fall back to default loader if custom template read fails', async () => {
@@ -281,7 +281,7 @@ describe('Generator', () => {
       await customGenerator.generate([]);
 
       const loaderCall = mockFs.writeFile.mock.calls.find((call) => call[0].includes('loader.js'));
-      expect(loaderCall![1]).toContain('loadManifest');
+      expect(loaderCall?.[1]).toContain('loadManifest');
     });
   });
 });

@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
+    "@types/glob": "^8.1.0",
     "@types/node": "^24.1.0",
     "@vitest/coverage-v8": "^3.2.4",
     "typescript": "^5.8.3",
@@ -67,6 +68,7 @@
     "acorn": "^8.15.0",
     "commander": "^14.0.0",
     "escodegen": "^2.1.0",
+    "glob": "^11.0.3",
     "js-beautify": "^1.15.4"
   }
 }
