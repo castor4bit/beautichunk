@@ -1,0 +1,2 @@
+// 難読化されたEコマースサイトのコード例
+var _0x4e2c=['log','cart','addItem','removeItem','calculateTotal','price','quantity','reduce','filter','id','User','name','email','orders','push','Product','description','stock','Order','userId','items','status','pending','OrderManager','users','products','findUser','find','findProduct','createOrder','processPayment','amount

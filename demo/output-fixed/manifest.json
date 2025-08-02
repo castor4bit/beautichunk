@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "chunks": [
+    {
+      "id": "chunk_000",
+      "filename": "chunk_000.js",
+      "dependencies": [],
+      "exports": [
+        "formatCurrency",
+        "validateEmail",
+        "generateId",
+        "debounce",
+        "deepClone",
+        "throttle",
+        "memoize"
+      ],
+      "size": 1773,
+      "order": 0
+    },
+    {
+      "id": "chunk_001",
+      "filename": "chunk_001.js",
+      "dependencies": [],
+      "exports": [
+        "API_BASE",
+        "headers",
+        "fetchWithRetry",
+        "api"
+      ],
+      "size": 1560,
+      "order": 0
+    }
+  ],
+  "entryPoint": "loader.js",
+  "totalSize": 3333,
+  "generatedAt": "2025-08-02T17:17:15.165Z"
+}
