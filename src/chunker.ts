@@ -28,7 +28,7 @@ interface CodeSegment {
 
 export class Chunker {
   private options: ChunkerOptions;
-  private chunkCounter = 0;
+  protected chunkCounter: number;
 
   constructor(options: Partial<ChunkerOptions> = {}) {
     this.options = {
@@ -37,6 +37,7 @@ export class Chunker {
       minChunkSize: options.minChunkSize,
       preserveComments: options.preserveComments ?? true,
     };
+    this.chunkCounter = 0;
   }
 
   chunk(ast: Program, analysis: AnalysisResult): Chunk[] {
