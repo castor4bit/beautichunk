@@ -257,11 +257,9 @@ describe('CLI', () => {
       await cli.run(args);
 
       // Check that index.js was created
-      const indexJsCall = mockFs.writeFile.mock.calls.find(
-        call => call[0].includes('index.js')
-      );
+      const indexJsCall = mockFs.writeFile.mock.calls.find((call) => call[0].includes('index.js'));
       expect(indexJsCall).toBeDefined();
-      
+
       // Verify the content includes shebang and require statements
       const content = indexJsCall?.[1] as string;
       expect(content).toContain('#!/usr/bin/env node');
@@ -272,7 +270,7 @@ describe('CLI', () => {
     it('should respect nodeEntry option from config file', async () => {
       const args = ['node', 'cli.js', 'input.js', '-o', 'output', '--config', 'custom.config.json'];
       const configContent = JSON.stringify({ nodeEntry: true });
-      
+
       mockFs.readFile
         .mockResolvedValueOnce(configContent) // config file
         .mockResolvedValueOnce('function test() { return 42; }');
@@ -282,9 +280,7 @@ describe('CLI', () => {
       await cli.run(args);
 
       // Check that index.js was created
-      const indexJsCall = mockFs.writeFile.mock.calls.find(
-        call => call[0].includes('index.js')
-      );
+      const indexJsCall = mockFs.writeFile.mock.calls.find((call) => call[0].includes('index.js'));
       expect(indexJsCall).toBeDefined();
     });
 
@@ -299,9 +295,7 @@ describe('CLI', () => {
       await cli.run(args);
 
       // Check that index.js was NOT created
-      const indexJsCall = mockFs.writeFile.mock.calls.find(
-        call => call[0].includes('index.js')
-      );
+      const indexJsCall = mockFs.writeFile.mock.calls.find((call) => call[0].includes('index.js'));
       expect(indexJsCall).toBeUndefined();
     });
   });
