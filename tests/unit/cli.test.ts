@@ -245,5 +245,64 @@ describe('CLI', () => {
 
       expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Processing'));
     });
+
+    it('should generate Node.js entry point when --node-entry option is used', async () => {
+      const args = ['node', 'cli.js', 'input.js', '-o', 'output', '--node-entry'];
+      mockFs.readFile
+        .mockResolvedValueOnce('{}') // config file
+        .mockResolvedValueOnce('function test() { return 42; }\nmodule.exports = { test };');
+      mockFs.mkdir.mockResolvedValue(undefined);
+      mockFs.writeFile.mockResolvedValue(undefined);
+
+      await cli.run(args);
+
+      // Check that index.js was created
+      const indexJsCall = mockFs.writeFile.mock.calls.find(
+        call => call[0].includes('index.js')
+      );
+      expect(indexJsCall).toBeDefined();
+      
+      // Verify the content includes shebang and require statements
+      const content = indexJsCall?.[1] as string;
+      expect(content).toContain('#!/usr/bin/env node');
+      expect(content).toContain('require(');
+      expect(content).toContain('module.exports = moduleExports;');
+    });
+
+    it('should respect nodeEntry option from config file', async () => {
+      const args = ['node', 'cli.js', 'input.js', '-o', 'output', '--config', 'custom.config.json'];
+      const configContent = JSON.stringify({ nodeEntry: true });
+      
+      mockFs.readFile
+        .mockResolvedValueOnce(configContent) // config file
+        .mockResolvedValueOnce('function test() { return 42; }');
+      mockFs.mkdir.mockResolvedValue(undefined);
+      mockFs.writeFile.mockResolvedValue(undefined);
+
+      await cli.run(args);
+
+      // Check that index.js was created
+      const indexJsCall = mockFs.writeFile.mock.calls.find(
+        call => call[0].includes('index.js')
+      );
+      expect(indexJsCall).toBeDefined();
+    });
+
+    it('should not generate Node.js entry point by default', async () => {
+      const args = ['node', 'cli.js', 'input.js', '-o', 'output'];
+      mockFs.readFile
+        .mockResolvedValueOnce('{}') // config file
+        .mockResolvedValueOnce('function test() { return 42; }');
+      mockFs.mkdir.mockResolvedValue(undefined);
+      mockFs.writeFile.mockResolvedValue(undefined);
+
+      await cli.run(args);
+
+      // Check that index.js was NOT created
+      const indexJsCall = mockFs.writeFile.mock.calls.find(
+        call => call[0].includes('index.js')
+      );
+      expect(indexJsCall).toBeUndefined();
+    });
   });
 });
