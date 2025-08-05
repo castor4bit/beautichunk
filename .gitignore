@@ -51,3 +51,7 @@ examples/*/package-lock.json
 .cache/
 .eslintcache
 .prettierCache
+
+# Project-specific directories
+.serena/
+demo/
