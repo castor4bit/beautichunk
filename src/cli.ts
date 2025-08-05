@@ -18,6 +18,7 @@ interface CLIOptions {
   indentChar?: 'space' | 'tab';
   preserveNewlines?: boolean;
   config?: string;
+  nodeEntry?: boolean;
 }
 
 interface ConfigFile {
@@ -25,6 +26,7 @@ interface ConfigFile {
   strategy?: 'aggressive' | 'conservative' | 'auto';
   sourceMaps?: boolean;
   beautifyOptions?: BeautifierOptions;
+  nodeEntry?: boolean;
 }
 
 export class CLI {
@@ -51,7 +53,8 @@ export class CLI {
       .option('--indent-size <size>', 'Indentation size')
       .option('--indent-char <char>', 'Indentation character (space or tab)')
       .option('--preserve-newlines', 'Preserve existing newlines')
-      .option('--config <file>', 'Configuration file path', 'beautichunk.config.json');
+      .option('--config <file>', 'Configuration file path', 'beautichunk.config.json')
+      .option('--node-entry', 'Generate Node.js entry point (index.js)');
   }
 
   async run(args: string[]): Promise<void> {
@@ -107,6 +110,7 @@ export class CLI {
     indentChar: 'space' | 'tab';
     preserveNewlines: boolean;
     config: string;
+    nodeEntry: boolean;
   } {
     const maxChunkSize = cliOptions.maxChunkSize
       ? Number.parseInt(cliOptions.maxChunkSize) * 1024
@@ -130,6 +134,7 @@ export class CLI {
       indentChar: cliOptions.indentChar || 'space',
       preserveNewlines: cliOptions.preserveNewlines || false,
       config: cliOptions.config || 'beautichunk.config.json',
+      nodeEntry: cliOptions.nodeEntry || config.nodeEntry || false,
     };
   }
 
@@ -142,6 +147,7 @@ export class CLI {
       sourceMaps: boolean;
       verbose: boolean;
       beautifyOptions: BeautifierOptions;
+      nodeEntry?: boolean;
     },
   ): Promise<void> {
     const { verbose, output } = options;
@@ -173,6 +179,7 @@ export class CLI {
     const generator = new Generator({
       outputDir: output,
       generateSourceMaps: options.sourceMaps,
+      generateNodeEntry: options.nodeEntry,
     });
 
     const allChunks = [];
