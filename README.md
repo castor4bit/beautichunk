@@ -6,9 +6,10 @@ Transform obfuscated JavaScript files into readable, chunked modules while maint
 
 Beautichunk is a TypeScript-based tool that takes minified or obfuscated JavaScript code and:
 - ✨ Beautifies the code for improved readability
-- 📦 Splits large files into manageable chunks (< 256KB)
+- 📦 Splits large files into manageable chunks
 - 🔗 Preserves execution order and dependencies
-- 🚀 Generates a loader for seamless integration
+- 🎭 Supports both browser and Node.js environments
+- 🚀 Generates appropriate loaders for each environment
 
 ## Installation
 
@@ -30,29 +31,78 @@ npm install beautichunk
 beautichunk input.js -o ./output
 ```
 
+Process multiple files:
+```bash
+beautichunk file1.js file2.js file3.js -o ./output
+```
+
+Use glob patterns:
+```bash
+beautichunk "src/**/*.js" -o ./output
+```
+
 #### Options
 
-- `-o, --output <dir>` - Output directory (default: `./output`)
-- `-s, --max-size <size>` - Maximum chunk size in KB (default: `256`)
-- `-m, --source-maps` - Generate source maps
-- `-v, --verbose` - Enable verbose logging
+- `-o, --output <dir>` - Output directory (required)
+- `--max-chunk-size <size>` - Maximum chunk size in KB (default: `256`)
+- `--source-maps` - Generate source maps
+- `--verbose` - Enable verbose logging
 - `--strategy <type>` - Chunking strategy: `aggressive`, `conservative`, or `auto` (default: `auto`)
-- `-c, --config <file>` - Configuration file path
+- `--config <file>` - Configuration file path (default: `beautichunk.config.json`)
+- `--node-entry` - Generate Node.js entry point (`index.js`) for chunked output
+- `--indent-size <size>` - Indentation size (default: `2`)
+- `--indent-char <char>` - Indentation character: `space` or `tab` (default: `space`)
+- `--preserve-newlines` - Preserve existing newlines
+
+### Node.js Entry Point
+
+When using the `--node-entry` option, Beautichunk generates an `index.js` file that:
+- Loads all chunks in the correct order
+- Collects and re-exports all module exports
+- Maintains the same API as the original file
+
+```bash
+# Process a Node.js module
+beautichunk large-module.js -o ./output --node-entry
+
+# Run the chunked module just like the original
+node ./output/index.js
+```
 
 ### Programmatic API
 
 ```typescript
-import { Beautichunk } from 'beautichunk';
+import { Parser, Analyzer, Chunker, Beautifier, Generator } from 'beautichunk';
 
-const beautichunk = new Beautichunk({
-  input: 'obfuscated.js',
-  output: './output',
-  maxChunkSize: 256 * 1024,
-  generateSourceMaps: true,
-  strategy: 'auto'
+// Parse JavaScript code
+const parser = new Parser();
+const ast = parser.parse(code);
+
+// Analyze dependencies
+const analyzer = new Analyzer();
+const analysis = analyzer.analyze(ast);
+
+// Split into chunks
+const chunker = new Chunker({
+  strategy: 'auto',
+  maxChunkSize: 256 * 1024
 });
+const chunks = chunker.chunk(ast, analysis);
 
-await beautichunk.process();
+// Beautify code
+const beautifier = new Beautifier({
+  indentSize: 2,
+  indentChar: ' '
+});
+const beautifiedChunks = chunks.map(chunk => beautifier.beautifyChunk(chunk));
+
+// Generate output files
+const generator = new Generator({
+  outputDir: './output',
+  generateSourceMaps: true,
+  generateNodeEntry: true
+});
+await generator.generate(beautifiedChunks);
 ```
 
 ## Configuration
@@ -61,25 +111,37 @@ Create a `beautichunk.config.json` file:
 
 ```json
 {
-  "input": "src/obfuscated.js",
-  "output": "dist/chunks",
   "maxChunkSize": 262144,
-  "beautifyOptions": {
-    "indent_size": 2,
-    "preserve_newlines": true
-  },
   "strategy": "conservative",
-  "generateSourceMaps": true
+  "sourceMaps": true,
+  "nodeEntry": true,
+  "beautifyOptions": {
+    "indentSize": 2,
+    "indentChar": " ",
+    "preserveNewlines": true
+  }
 }
 ```
 
+Configuration options:
+- `maxChunkSize` - Maximum chunk size in bytes (default: `262144` = 256KB)
+- `strategy` - Chunking strategy: `aggressive`, `conservative`, or `auto`
+- `sourceMaps` - Generate source maps
+- `nodeEntry` - Generate Node.js entry point
+- `beautifyOptions` - Code formatting options
+  - `indentSize` - Number of spaces/tabs for indentation
+  - `indentChar` - Character to use: `" "` (space) or `"\t"` (tab)
+  - `preserveNewlines` - Keep original line breaks
+
 ## How It Works
 
-1. **Parsing** - The obfuscated JavaScript is parsed into an Abstract Syntax Tree (AST)
-2. **Beautification** - Code is reformatted for readability using configurable rules
-3. **Analysis** - Dependencies between code sections are mapped
-4. **Chunking** - Code is intelligently split based on size constraints and dependencies
-5. **Generation** - Individual chunk files and a loader module are created
+1. **Parsing** - JavaScript code is parsed into an Abstract Syntax Tree (AST) using Acorn
+2. **Analysis** - Dependencies between functions and variables are mapped using Tarjan's algorithm
+3. **Chunking** - Code is intelligently split based on size constraints and dependencies
+4. **Beautification** - Each chunk is reformatted for readability using js-beautify
+5. **Generation** - Individual chunk files and appropriate loader modules are created
+   - For browsers: `loader.js` with async chunk loading
+   - For Node.js: `index.js` with synchronous requires
 
 ## Chunking Strategies
 
@@ -89,6 +151,8 @@ Create a `beautichunk.config.json` file:
 
 ## Example
 
+### Browser Usage
+
 Input (obfuscated):
 ```javascript
 (function(){var a=1,b=2;function c(){return a+b}console.log(c())})();
@@ -97,10 +161,33 @@ Input (obfuscated):
 Output structure:
 ```
 output/
-├── chunk-0.js
-├── chunk-1.js
-├── loader.js
-└── manifest.json
+├── chunk_000.js    # Variable declarations
+├── chunk_001.js    # Function definitions
+├── chunk_002.js    # Execution code
+├── loader.js       # Browser loader
+└── manifest.json   # Chunk metadata
+```
+
+Usage in HTML:
+```html
+<script src="output/loader.js"></script>
+```
+
+### Node.js Usage
+
+For Node.js modules with `--node-entry`:
+```
+output/
+├── chunk_000.js    # Core functionality
+├── chunk_001.js    # Additional features
+├── index.js        # Node.js entry point
+└── manifest.json   # Chunk metadata
+```
+
+Usage:
+```javascript
+// Original: const lib = require('./large-module.js');
+// Chunked:  const lib = require('./output/index.js');
 ```
 
 ## Current Limitations
@@ -138,7 +225,10 @@ src/
 ├── parser.ts      # AST parsing using Acorn
 ├── analyzer.ts    # Dependency and scope analysis
 ├── chunker.ts     # Code splitting logic
-├── index.ts       # Main API
+├── beautifier.ts  # Code formatting
+├── generator.ts   # Output file generation
+├── file-io.ts     # File system operations
+├── index.ts       # Main API exports
 └── cli.ts         # Command-line interface
 ```
 
