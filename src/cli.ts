@@ -44,12 +44,12 @@ export class CLI {
       .version('0.1.0')
       .argument('<files...>', 'Input files (supports glob patterns)')
       .requiredOption('-o, --output <dir>', 'Output directory')
-      .option('--max-chunk-size <size>', 'Maximum chunk size in KB', '256')
-      .option('--strategy <strategy>', 'Chunking strategy', 'auto')
+      .option('--max-chunk-size <size>', 'Maximum chunk size in KB')
+      .option('--strategy <strategy>', 'Chunking strategy')
       .option('--source-maps', 'Generate source maps')
       .option('--verbose', 'Enable verbose output')
-      .option('--indent-size <size>', 'Indentation size', '2')
-      .option('--indent-char <char>', 'Indentation character (space or tab)', 'space')
+      .option('--indent-size <size>', 'Indentation size')
+      .option('--indent-char <char>', 'Indentation character (space or tab)')
       .option('--preserve-newlines', 'Preserve existing newlines')
       .option('--config <file>', 'Configuration file path', 'beautichunk.config.json');
   }
