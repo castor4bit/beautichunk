@@ -47,6 +47,35 @@ describe('Parser', () => {
       expect(ast.body[0].declarations[0].id.name).toBe('message');
     });
 
+    it('should parse code with shebang', () => {
+      const parser = new Parser();
+      const codeWithShebang = `#!/usr/bin/env node
+const x = 1;
+console.log(x);`;
+      const ast = parser.parse(codeWithShebang);
+
+      expect(ast).toBeDefined();
+      expect(ast.type).toBe('Program');
+      expect(ast.body).toHaveLength(2);
+      expect(ast.body[0].type).toBe('VariableDeclaration');
+    });
+
+    it('should parse code with different shebang formats', () => {
+      const parser = new Parser();
+      const testCases = [
+        '#!/usr/bin/node\nconst x = 1;',
+        '#!/usr/local/bin/node\nconst x = 1;',
+        '#!/usr/bin/env node\nconst x = 1;',
+      ];
+
+      testCases.forEach((code) => {
+        const ast = parser.parse(code);
+        expect(ast).toBeDefined();
+        expect(ast.type).toBe('Program');
+        expect(ast.body[0].type).toBe('VariableDeclaration');
+      });
+    });
+
     it('should parse function declaration', () => {
       const parser = new Parser();
       const code = 'function greet(name) { return "Hello " + name; }';

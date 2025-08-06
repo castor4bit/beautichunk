@@ -26,6 +26,7 @@ export class Parser {
       ecmaVersion: 2022, // TODO: Support ES2023+ features
       sourceType: 'module',
       locations: true,
+      allowHashBang: true, // Enable shebang support by default
       ...options,
     };
     // TODO: Add support for JSX/TSX parsing
