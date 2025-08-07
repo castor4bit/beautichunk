@@ -58,7 +58,14 @@ export class Chunker {
     const segments: CodeSegment[] = [];
 
     for (const node of ast.body) {
-      const code = escodegen.generate(node);
+      let code: string;
+      try {
+        code = escodegen.generate(node);
+      } catch {
+        // Handle unsupported ES2022+ syntax
+        console.warn(`Warning: Unable to generate code for ${node.type} node. Skipping.`);
+        continue; // Skip this segment
+      }
       const size = Buffer.byteLength(code, 'utf8');
       const nodeExports = new Set<string>();
       const nodeDependencies = new Set<string>();

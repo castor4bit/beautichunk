@@ -40,6 +40,41 @@ describe('Chunker', () => {
       expect(chunks[0].content).toContain('const y = 2');
     });
 
+    it('should handle ES2022+ syntax without crashing', () => {
+      const parser = new Parser();
+      const analyzer = new Analyzer();
+      const chunker = new Chunker({
+        strategy: 'auto',
+        maxChunkSize: 256 * 1024,
+      });
+
+      // Code with ES2022+ features that escodegen doesn't support
+      const codeWithModernSyntax = `
+        class MyClass {
+          static {
+            // Static initialization block (ES2022)
+            console.log('Static block');
+          }
+          #privateField = 42; // Private field (ES2022)
+          
+          method() {
+            const value = obj?.prop?.nested; // Optional chaining
+            return value ?? 'default'; // Nullish coalescing
+          }
+        }
+      `;
+
+      const ast = parser.parse(codeWithModernSyntax);
+      const analysis = analyzer.analyze(ast);
+
+      // Should not throw error even with unsupported syntax
+      expect(() => chunker.chunk(ast, analysis)).not.toThrow();
+
+      const chunks = chunker.chunk(ast, analysis);
+      expect(chunks).toBeDefined();
+      expect(Array.isArray(chunks)).toBe(true);
+    });
+
     it('should split code when exceeding size limit', () => {
       const parser = new Parser();
       const analyzer = new Analyzer();
