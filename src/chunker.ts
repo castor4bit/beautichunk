@@ -1,6 +1,7 @@
 import type { Node, Program } from 'acorn';
-import escodegen from 'escodegen';
-import type { AnalysisResult } from './analyzer';
+import type { AnalysisResult } from './analyzer.js';
+import { HybridGenerator } from './generator/hybrid-generator.js';
+import type { CodeGenerator } from './generator/types.js';
 
 export interface ChunkerOptions {
   strategy: 'aggressive' | 'conservative' | 'auto';
@@ -29,8 +30,9 @@ interface CodeSegment {
 export class Chunker {
   private options: ChunkerOptions;
   protected chunkCounter: number;
+  private generator: CodeGenerator;
 
-  constructor(options: Partial<ChunkerOptions> = {}) {
+  constructor(options: Partial<ChunkerOptions> = {}, generator?: CodeGenerator) {
     this.options = {
       strategy: options.strategy || 'auto',
       maxChunkSize: options.maxChunkSize || 256 * 1024, // 256KB default
@@ -38,6 +40,7 @@ export class Chunker {
       preserveComments: options.preserveComments ?? true,
     };
     this.chunkCounter = 0;
+    this.generator = generator || new HybridGenerator();
   }
 
   chunk(ast: Program, analysis: AnalysisResult): Chunk[] {
@@ -60,10 +63,10 @@ export class Chunker {
     for (const node of ast.body) {
       let code: string;
       try {
-        code = escodegen.generate(node);
-      } catch {
-        // Handle unsupported ES2022+ syntax
-        console.warn(`Warning: Unable to generate code for ${node.type} node. Skipping.`);
+        code = this.generator.generate(node);
+      } catch (error) {
+        // Handle generation errors
+        console.warn(`Warning: Unable to generate code for ${node.type} node. Skipping.`, error);
         continue; // Skip this segment
       }
       const size = Buffer.byteLength(code, 'utf8');
