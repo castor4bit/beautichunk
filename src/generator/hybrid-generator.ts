@@ -1,8 +1,8 @@
 import type { Node } from 'acorn';
-import { BabelAdapter } from './adapters/babel-adapter';
-import { EscodegenAdapter } from './adapters/escodegen-adapter';
-import { ASTConverter } from './converter/ast-converter';
-import type { CodeGenerator, GeneratorOptions } from './types';
+import { BabelAdapter } from './adapters/babel-adapter.js';
+import { EscodegenAdapter } from './adapters/escodegen-adapter.js';
+import { ASTConverter } from './converter/ast-converter.js';
+import type { CodeGenerator, GeneratorOptions } from './types.js';
 
 /**
  * Hybrid code generator that uses escodegen for ES5/ES6 and @babel/generator for ES2022+

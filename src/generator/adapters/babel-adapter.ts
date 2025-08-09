@@ -1,5 +1,5 @@
 import generate from '@babel/generator';
-import type { CodeGenerator, GeneratorOptions } from '../types';
+import type { CodeGenerator, GeneratorOptions } from '../types.js';
 
 /**
  * Adapter for @babel/generator

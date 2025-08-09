@@ -1,7 +1,7 @@
 import type { Node, Program } from 'acorn';
-import type { AnalysisResult } from './analyzer';
-import { HybridGenerator } from './generator/hybrid-generator';
-import type { CodeGenerator } from './generator/types';
+import type { AnalysisResult } from './analyzer.js';
+import { HybridGenerator } from './generator/hybrid-generator.js';
+import type { CodeGenerator } from './generator/types.js';
 
 export interface ChunkerOptions {
   strategy: 'aggressive' | 'conservative' | 'auto';

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Analyzer } from '../../src/analyzer';
-import { Chunker } from '../../src/chunker';
-import { Parser } from '../../src/parser';
+import { Analyzer } from '../../src/analyzer.js';
+import { Chunker } from '../../src/chunker.js';
+import { Parser } from '../../src/parser.js';
 
 describe('ES2022+ Support Integration', () => {
   const parser = new Parser();

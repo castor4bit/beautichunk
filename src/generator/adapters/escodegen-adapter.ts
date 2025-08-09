@@ -1,6 +1,6 @@
 import type { Node } from 'acorn';
 import * as escodegen from 'escodegen';
-import type { CodeGenerator, GeneratorOptions } from '../types';
+import type { CodeGenerator, GeneratorOptions } from '../types.js';
 
 /**
  * Adapter for escodegen generator

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { HybridGenerator } from '../../../src/generator/hybrid-generator';
-import type { CodeGenerator } from '../../../src/generator/types';
-import { Parser } from '../../../src/parser';
+import { HybridGenerator } from '../../../src/generator/hybrid-generator.js';
+import type { CodeGenerator } from '../../../src/generator/types.js';
+import { Parser } from '../../../src/parser.js';
 
 describe('HybridGenerator', () => {
   let generator: CodeGenerator;
