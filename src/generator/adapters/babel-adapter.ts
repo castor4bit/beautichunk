@@ -1,5 +1,8 @@
-import generate from '@babel/generator';
+import babelGenerate from '@babel/generator';
 import type { CodeGenerator, GeneratorOptions } from '../types.js';
+
+// Handle both CommonJS and ESM imports
+const generate = (babelGenerate as any).default || babelGenerate;
 
 /**
  * Adapter for @babel/generator
