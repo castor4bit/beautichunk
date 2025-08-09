@@ -56,6 +56,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/generator/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "jsxQuoteStyle": "double",
