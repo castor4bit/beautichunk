@@ -32,6 +32,10 @@ export class ASTConverter {
         return this.convertBlockStatement(node);
       case 'ForStatement':
         return this.convertForStatement(node);
+      case 'ForInStatement':
+        return this.convertForInStatement(node);
+      case 'ForOfStatement':
+        return this.convertForOfStatement(node);
       case 'WhileStatement':
         return this.convertWhileStatement(node);
       case 'DoWhileStatement':
@@ -225,6 +229,26 @@ export class ASTConverter {
     const update = node.update ? this.convert(node.update) : null;
     const body = this.convert(node.body);
     return t.forStatement(init, test, update, body);
+  }
+
+  private convertForInStatement(node: any): t.ForInStatement {
+    const left =
+      node.left.type === 'VariableDeclaration'
+        ? this.convert(node.left)
+        : this.convertPattern(node.left);
+    const right = this.convert(node.right);
+    const body = this.convert(node.body);
+    return t.forInStatement(left, right, body);
+  }
+
+  private convertForOfStatement(node: any): t.ForOfStatement {
+    const left =
+      node.left.type === 'VariableDeclaration'
+        ? this.convert(node.left)
+        : this.convertPattern(node.left);
+    const right = this.convert(node.right);
+    const body = this.convert(node.body);
+    return t.forOfStatement(left, right, body, node.await || false);
   }
 
   private convertWhileStatement(node: any): t.WhileStatement {
