@@ -99,6 +99,16 @@ export class ASTConverter {
         return t.yieldExpression(node.argument ? this.convert(node.argument) : null, node.delegate);
       case 'SequenceExpression':
         return this.convertSequenceExpression(node);
+      case 'ImportExpression':
+        return this.convertImportExpression(node);
+      case 'Super':
+        return t.super();
+      case 'MetaProperty':
+        return this.convertMetaProperty(node);
+      case 'ClassExpression':
+        return this.convertClassExpression(node);
+      case 'EmptyStatement':
+        return t.emptyStatement();
 
       default:
         console.warn(`Unsupported node type: ${node.type}`);
@@ -538,5 +548,21 @@ export class ASTConverter {
   private convertSequenceExpression(node: any): t.SequenceExpression {
     const expressions = node.expressions.map((expr: any) => this.convert(expr));
     return t.sequenceExpression(expressions);
+  }
+
+  private convertImportExpression(node: any): t.Import | t.CallExpression {
+    // @babel/types doesn't have a direct import() expression, use callExpression with import
+    return t.callExpression(t.import(), [this.convert(node.source)]);
+  }
+
+  private convertMetaProperty(node: any): t.MetaProperty {
+    return t.metaProperty(t.identifier(node.meta.name), t.identifier(node.property.name));
+  }
+
+  private convertClassExpression(node: any): t.ClassExpression {
+    const id = node.id ? t.identifier(node.id.name) : null;
+    const superClass = node.superClass ? this.convert(node.superClass) : null;
+    const body = this.convertClassBody(node.body);
+    return t.classExpression(id, superClass, body);
   }
 }
