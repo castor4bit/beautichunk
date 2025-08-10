@@ -266,7 +266,12 @@ export class ASTConverter {
   }
 
   private convertDoWhileStatement(node: any): t.DoWhileStatement {
-    return t.doWhileStatement(this.convert(node.body), this.convert(node.test));
+    // Handle cases where test might be wrapped in an ExpressionStatement
+    const test =
+      node.test.type === 'ExpressionStatement'
+        ? this.convert(node.test.expression)
+        : this.convert(node.test);
+    return t.doWhileStatement(this.convert(node.body), test);
   }
 
   private convertSwitchStatement(node: any): t.SwitchStatement {
