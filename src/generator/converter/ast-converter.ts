@@ -93,6 +93,8 @@ export class ASTConverter {
         return t.awaitExpression(this.convert(node.argument));
       case 'YieldExpression':
         return t.yieldExpression(node.argument ? this.convert(node.argument) : null, node.delegate);
+      case 'SequenceExpression':
+        return this.convertSequenceExpression(node);
 
       default:
         console.warn(`Unsupported node type: ${node.type}`);
@@ -507,5 +509,10 @@ export class ASTConverter {
   private convertArrayPattern(node: any): t.ArrayPattern {
     const elements = node.elements.map((el: any) => (el ? this.convertPattern(el) : null));
     return t.arrayPattern(elements);
+  }
+
+  private convertSequenceExpression(node: any): t.SequenceExpression {
+    const expressions = node.expressions.map((expr: any) => this.convert(expr));
+    return t.sequenceExpression(expressions);
   }
 }
