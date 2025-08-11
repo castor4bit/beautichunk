@@ -266,12 +266,41 @@ export class ASTConverter {
   }
 
   private convertDoWhileStatement(node: any): t.DoWhileStatement {
-    // Handle cases where test might be wrapped in an ExpressionStatement
-    const test =
-      node.test.type === 'ExpressionStatement'
-        ? this.convert(node.test.expression)
-        : this.convert(node.test);
-    return t.doWhileStatement(this.convert(node.body), test);
+    // Handle malformed ASTs where test might be a Statement instead of Expression
+    let test: t.Expression;
+
+    if (node.test.type === 'ExpressionStatement') {
+      // Extract expression from ExpressionStatement
+      test = this.convert(node.test.expression);
+    } else if (node.test.type === 'BlockStatement') {
+      // BlockStatement with statements - try to extract first expression or default to true
+      if (
+        node.test.body &&
+        node.test.body.length > 0 &&
+        node.test.body[0].type === 'ExpressionStatement'
+      ) {
+        test = this.convert(node.test.body[0].expression);
+      } else {
+        console.warn('DoWhileStatement has BlockStatement test, defaulting to true');
+        test = t.booleanLiteral(true);
+      }
+    } else if (
+      node.test.type === 'IfStatement' ||
+      node.test.type === 'EmptyStatement' ||
+      node.test.type === 'ReturnStatement' ||
+      node.test.type === 'ThrowStatement'
+    ) {
+      // These are statements, not expressions - default to true to avoid crash
+      console.warn(`DoWhileStatement has ${node.test.type} test, defaulting to true`);
+      test = t.booleanLiteral(true);
+    } else {
+      // Normal case - test is already an Expression
+      test = this.convert(node.test);
+    }
+
+    const body = this.convert(node.body);
+    // @babel/types doWhileStatement expects (test: Expression, body: Statement)
+    return (t as any).doWhileStatement(test, body);
   }
 
   private convertSwitchStatement(node: any): t.SwitchStatement {
