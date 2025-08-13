@@ -1,0 +1,215 @@
+name: PR Requirements
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches: [main]
+
+jobs:
+  check-pr-format:
+    name: Check PR Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Title Format
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "Checking PR title: $PR_TITLE"
+          
+          # Check if title follows conventional commits format
+          if ! echo "$PR_TITLE" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+$'; then
+            echo "❌ PR title does not follow conventional commits format!"
+            echo ""
+            echo "Expected format: type(scope): description"
+            echo ""
+            echo "Valid types:"
+            echo "  - feat: A new feature"
+            echo "  - fix: A bug fix"
+            echo "  - docs: Documentation only changes"
+            echo "  - style: Code style changes (formatting, etc)"
+            echo "  - refactor: Code refactoring"
+            echo "  - perf: Performance improvements"
+            echo "  - test: Adding or updating tests"
+            echo "  - build: Build system changes"
+            echo "  - ci: CI configuration changes"
+            echo "  - chore: Other changes (tooling, etc)"
+            echo "  - revert: Reverting a previous commit"
+            echo ""
+            echo "Examples:"
+            echo "  - feat(auth): add OAuth2 login support"
+            echo "  - fix(api): resolve memory leak in user service"
+            echo "  - docs: update installation instructions"
+            exit 1
+          fi
+          
+          echo "✅ PR title format is valid"
+
+      - name: Check PR Description
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          
+          if [ -z "$PR_BODY" ]; then
+            echo "❌ PR description is empty!"
+            echo "Please provide a description of your changes."
+            exit 1
+          fi
+          
+          # Check minimum length (at least 50 characters)
+          if [ ${#PR_BODY} -lt 50 ]; then
+            echo "❌ PR description is too short!"
+            echo "Please provide a more detailed description (at least 50 characters)."
+            exit 1
+          fi
+          
+          echo "✅ PR description is present"
+
+      - name: Check Branch Name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Checking branch name: $BRANCH_NAME"
+          
+          # Check if branch follows naming convention
+          if ! echo "$BRANCH_NAME" | grep -qE '^(feature|fix|docs|refactor|test|chore|hotfix|release)/.+$'; then
+            echo "❌ Branch name does not follow naming convention!"
+            echo ""
+            echo "Expected format: type/description"
+            echo ""
+            echo "Valid types:"
+            echo "  - feature/ : New features"
+            echo "  - fix/     : Bug fixes"
+            echo "  - docs/    : Documentation changes"
+            echo "  - refactor/: Code refactoring"
+            echo "  - test/    : Test additions or changes"
+            echo "  - chore/   : Maintenance tasks"
+            echo "  - hotfix/  : Urgent production fixes"
+            echo "  - release/ : Release preparation"
+            echo ""
+            echo "Examples:"
+            echo "  - feature/user-authentication"
+            echo "  - fix/memory-leak"
+            echo "  - docs/api-documentation"
+            exit 1
+          fi
+          
+          echo "✅ Branch name format is valid"
+
+  check-files:
+    name: Check File Changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for large files
+        run: |
+          # Check for files larger than 1MB
+          large_files=$(find . -type f -size +1M 2>/dev/null | grep -v "^./.git" || true)
+          
+          if [ ! -z "$large_files" ]; then
+            echo "⚠️ Warning: Large files detected (>1MB):"
+            echo "$large_files"
+            echo ""
+            echo "Consider using Git LFS for large files."
+          fi
+
+      - name: Check for sensitive data patterns
+        run: |
+          # Check for potential secrets or sensitive data
+          # This is a basic check - consider using dedicated tools like GitLeaks
+          
+          patterns=(
+            "password.*=.*['\"].*['\"]"
+            "api[_-]?key.*=.*['\"].*['\"]"
+            "secret.*=.*['\"].*['\"]"
+            "token.*=.*['\"].*['\"]"
+            "private[_-]?key"
+          )
+          
+          for pattern in "${patterns[@]}"; do
+            matches=$(git diff origin/main...HEAD --unified=0 | grep -iE "$pattern" || true)
+            if [ ! -z "$matches" ]; then
+              echo "⚠️ Warning: Potential sensitive data detected!"
+              echo "Pattern: $pattern"
+              echo "Please ensure no secrets are committed."
+              # Don't fail the check, just warn
+            fi
+          done
+
+  pr-size-check:
+    name: Check PR Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const { additions, deletions, changed_files } = pr;
+            
+            console.log(`PR Statistics:`);
+            console.log(`  Files changed: ${changed_files}`);
+            console.log(`  Lines added: ${additions}`);
+            console.log(`  Lines deleted: ${deletions}`);
+            console.log(`  Total changes: ${additions + deletions}`);
+            
+            // Warn if PR is too large
+            if (changed_files > 50) {
+              core.warning(`This PR changes ${changed_files} files. Consider breaking it into smaller PRs.`);
+            }
+            
+            if (additions + deletions > 1000) {
+              core.warning(`This PR has ${additions + deletions} line changes. Large PRs are harder to review.`);
+            }
+            
+            // Add labels based on size
+            const labels = [];
+            if (additions + deletions < 10) {
+              labels.push('size/XS');
+            } else if (additions + deletions < 50) {
+              labels.push('size/S');
+            } else if (additions + deletions < 200) {
+              labels.push('size/M');
+            } else if (additions + deletions < 500) {
+              labels.push('size/L');
+            } else {
+              labels.push('size/XL');
+            }
+            
+            // Note: Adding labels requires write permissions
+            console.log(`Suggested label: ${labels[0]}`);
+
+  check-commits:
+    name: Check Commit Messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        run: |
+          echo "Checking commit messages..."
+          
+          # Get all commits in this PR
+          commits=$(git log origin/main..HEAD --pretty=format:"%s")
+          
+          invalid_commits=""
+          while IFS= read -r commit_msg; do
+            if [ ! -z "$commit_msg" ]; then
+              # Check if commit message follows conventional format
+              if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+$'; then
+                invalid_commits="${invalid_commits}\n  ❌ ${commit_msg}"
+              fi
+            fi
+          done <<< "$commits"
+          
+          if [ ! -z "$invalid_commits" ]; then
+            echo "⚠️ Some commit messages don't follow conventional commits format:"
+            echo -e "$invalid_commits"
+            echo ""
+            echo "While not required, it's recommended to use conventional commits."
+          else
+            echo "✅ All commit messages follow conventional format"
+          fi
