@@ -11,20 +11,16 @@
   },
   "rules": [
     {
-      "type": "deletion",
-      "description": "Prevent branch deletion"
+      "type": "deletion"
     },
     {
-      "type": "non_fast_forward",
-      "description": "Prevent force pushes"
+      "type": "non_fast_forward"
     },
     {
-      "type": "creation",
-      "description": "Prevent branch recreation"
+      "type": "creation"
     },
     {
-      "type": "required_linear_history",
-      "description": "Require linear history"
+      "type": "required_linear_history"
     },
     {
       "type": "pull_request",
@@ -34,29 +30,24 @@
         "require_code_owner_review": false,
         "require_last_push_approval": false,
         "required_review_thread_resolution": true
-      },
-      "description": "Require pull request before merging"
+      }
     },
     {
       "type": "required_status_checks",
       "parameters": {
-        "strict_required_status_checks_policy": true,
         "required_status_checks": [
           {
-            "context": "test (20.x)",
-            "integration_id": null
+            "context": "test (20.x)"
           },
           {
-            "context": "test (22.x)",
-            "integration_id": null
+            "context": "test (22.x)"
           },
           {
-            "context": "test (24.x)",
-            "integration_id": null
+            "context": "test (24.x)"
           }
-        ]
-      },
-      "description": "Require CI status checks to pass"
+        ],
+        "strict_required_status_checks_policy": true
+      }
     }
   ],
   "bypass_actors": []
